@@ -15,6 +15,8 @@ export default class LaserBall {
     this.radius = radius;
     this.color = color;
     this.history = [];
+    // contains [x, y] coordinates
+    // used to interpolate movement at a 60th of a second
     this.path = [];
     this.movement = 'stationary';
   }
@@ -55,7 +57,15 @@ export default class LaserBall {
    * @param {*} yDest
    * @param {*} approximate
    */
-  curveMovement(duration, xDest, yDest, approximate) {
+  curveMovement(
+    duration,
+    xDest,
+    yDest,
+    amp = 100,
+    freqx = 1,
+    freqy = 4,
+    approximate
+  ) {
     let dx = (xDest - this.x) / (duration * 60);
     let dy = (yDest - this.y) / (duration * 60);
 
@@ -69,9 +79,15 @@ export default class LaserBall {
       moveY += dy;
       this.path.push([
         moveX +
-          100 * Math.cos((dx * loopCount * Math.PI) / Math.abs(xDest - this.x)),
+          amp *
+            Math.cos(
+              (freqx * dx * loopCount * Math.PI) / Math.abs(xDest - this.x)
+            ),
         moveY +
-          100 * Math.sin((dy * loopCount * Math.PI) / Math.abs(yDest - this.y)),
+          amp *
+            Math.sin(
+              (freqy * dy * loopCount * Math.PI) / Math.abs(yDest - this.y)
+            ),
       ]);
       loopCount++;
     }
